@@ -17,6 +17,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
+import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.EquipmentSlot
 import java.util.UUID
@@ -177,6 +178,18 @@ internal object FluidPipePlacementService : Listener {
         if (RebarItem.isRebarItem(event.offHandItem, FluidPipe::class.java)) {
             event.isCancelled = true
             return
+        }
+    }
+
+    @EventHandler
+    private fun onTeleport(event: PlayerTeleportEvent) {
+        if (!connectionsInProgress.containsKey(event.player)) return
+
+        val fromWorld = event.from.world
+        val toWorld = event.to.world
+
+        if (!fromWorld.equals(toWorld)) {
+            cancelConnection(event.player)
         }
     }
 
