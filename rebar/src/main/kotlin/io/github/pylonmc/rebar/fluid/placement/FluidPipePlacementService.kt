@@ -181,18 +181,6 @@ internal object FluidPipePlacementService : Listener {
         }
     }
 
-    @EventHandler
-    private fun onTeleport(event: PlayerTeleportEvent) {
-        if (!connectionsInProgress.containsKey(event.player)) return
-
-        val fromWorld = event.from.world
-        val toWorld = event.to.world
-
-        if (!fromWorld.equals(toWorld)) {
-            cancelConnection(event.player)
-        }
-    }
-
     /**
      * Intended to prevent issues if players teleport away while placing a pipe
      */
