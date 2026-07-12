@@ -19,7 +19,7 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.inventory.EquipmentSlot
-import java.util.*
+import java.util.UUID
 
 internal object FluidPipePlacementService : Listener {
     /**
