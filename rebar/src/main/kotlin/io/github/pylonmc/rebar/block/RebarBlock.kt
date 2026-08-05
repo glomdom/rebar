@@ -147,12 +147,18 @@ open class RebarBlock private constructor(val block: Block) : WailaSupplier, Key
 
     fun <D : BlockData> getBlockData(dataType: Class<D>) = block.getBlockData(dataType)
 
+    inline fun <reified D : BlockData> getBlockData() = block.getBlockData(D::class.java)
+
     @JvmOverloads
     fun editBlockData(editor: Consumer<BlockData>, applyPhysics: Boolean = true) = editBlockData(BlockData::class.java, editor, applyPhysics)
 
     @JvmOverloads
     fun <D : BlockData> editBlockData(dataType: Class<D>, editor: Consumer<D>, applyPhysics: Boolean = true) {
         block.editBlockData(dataType, editor, applyPhysics)
+    }
+
+    inline fun <reified D : BlockData> editBlockData(editor: Consumer<D>, applyPhysics: Boolean = true) {
+        block.editBlockData(editor, applyPhysics)
     }
 
     /**

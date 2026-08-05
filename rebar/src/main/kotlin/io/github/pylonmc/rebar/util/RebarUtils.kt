@@ -916,6 +916,8 @@ fun <D: BlockData> Block.editBlockData(dataType: Class<D>, editor: Consumer<D>, 
     setBlockData(blockData, applyPhysics)
 }
 
+inline fun <reified D: BlockData> Block.editBlockData(editor: Consumer<D>, applyPhysics: Boolean = true) = editBlockData(D::class.java, editor, applyPhysics)
+
 fun <D: BlockData> Block.getBlockData(dataType: Class<D>): D {
     val blockData = this.blockData
     Preconditions.checkState(dataType.isInstance(blockData))
@@ -925,7 +927,7 @@ fun <D: BlockData> Block.getBlockData(dataType: Class<D>): D {
 fun ItemStack.isBroken(): Boolean {
     val maxDamage = getData(DataComponentTypes.MAX_DAMAGE) ?: return false
     val damage = getData(DataComponentTypes.DAMAGE) ?: return false
-    return damage >= maxDamage && !hasData(DataComponentTypes.UNBREAKABLE);
+    return !hasData(DataComponentTypes.UNBREAKABLE) && damage >= maxDamage
 }
 
 /**
@@ -937,7 +939,7 @@ fun ItemStack.isBroken(): Boolean {
 fun ItemStack.hasOneDurabilityLeft(): Boolean {
     val maxDamage = getData(DataComponentTypes.MAX_DAMAGE) ?: return false
     val damage = getData(DataComponentTypes.DAMAGE) ?: return false
-    return damage == maxDamage - 1 && !hasData(DataComponentTypes.UNBREAKABLE);
+    return !hasData(DataComponentTypes.UNBREAKABLE) && damage == maxDamage - 1
 }
 
 const val FLUID_EPSILON = 1.0e-6
