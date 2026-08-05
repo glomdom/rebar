@@ -20,7 +20,7 @@ import io.github.pylonmc.rebar.item.builder.ItemStackBuilder
 import io.github.pylonmc.rebar.nms.NmsAccessor
 import io.github.pylonmc.rebar.registry.RebarRegistry
 import io.github.pylonmc.rebar.util.IMMEDIATE_FACES
-import io.github.pylonmc.rebar.util.editBlockData
+import io.github.pylonmc.rebar.util.editBlockDataAs
 import io.github.pylonmc.rebar.util.getBlockData
 import io.github.pylonmc.rebar.util.isChunkLoaded
 import io.github.pylonmc.rebar.util.position.BlockPosition
@@ -143,22 +143,23 @@ open class RebarBlock private constructor(val block: Block) : WailaSupplier, Key
      */
     open fun postInitialise() {}
 
-    fun getBlockData() = getBlockData(BlockData::class.java)
+    fun getBlockData() = getBlockDataAs(BlockData::class.java)
 
-    fun <D : BlockData> getBlockData(dataType: Class<D>) = block.getBlockData(dataType)
+    fun <D : BlockData> getBlockDataAs(dataType: Class<D>) = block.getBlockData(dataType)
 
-    inline fun <reified D : BlockData> getBlockData() = block.getBlockData(D::class.java)
-
-    @JvmOverloads
-    fun editBlockData(editor: Consumer<BlockData>, applyPhysics: Boolean = true) = editBlockData(BlockData::class.java, editor, applyPhysics)
+    @JvmSynthetic
+    inline fun <reified D : BlockData> getBlockDataAs() = block.getBlockData(D::class.java)
 
     @JvmOverloads
-    fun <D : BlockData> editBlockData(dataType: Class<D>, editor: Consumer<D>, applyPhysics: Boolean = true) {
-        block.editBlockData(dataType, editor, applyPhysics)
+    fun editBlockData(editor: Consumer<BlockData>, applyPhysics: Boolean = true) = editBlockDataAs(BlockData::class.java, editor, applyPhysics)
+
+    @JvmOverloads
+    fun <D : BlockData> editBlockDataAs(dataType: Class<D>, editor: Consumer<D>, applyPhysics: Boolean = true) {
+        block.editBlockDataAs(dataType, editor, applyPhysics)
     }
 
-    inline fun <reified D : BlockData> editBlockData(editor: Consumer<D>, applyPhysics: Boolean = true) {
-        block.editBlockData(editor, applyPhysics)
+    inline fun <reified D : BlockData> editBlockDataAs(editor: Consumer<D>, applyPhysics: Boolean = true) {
+        block.editBlockDataAs(editor, applyPhysics)
     }
 
     /**

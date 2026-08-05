@@ -907,16 +907,17 @@ fun VirtualInventory.unsafeSubtract(slot: Int, amount: Int) {
 }
 
 @JvmOverloads
-fun Block.editBlockData(editor: Consumer<BlockData>, applyPhysics: Boolean = true) = editBlockData(BlockData::class.java, editor, applyPhysics)
+fun Block.editBlockData(editor: Consumer<BlockData>, applyPhysics: Boolean = true) = editBlockDataAs(BlockData::class.java, editor, applyPhysics)
 
 @JvmOverloads
-fun <D: BlockData> Block.editBlockData(dataType: Class<D>, editor: Consumer<D>, applyPhysics: Boolean = true) {
+fun <D: BlockData> Block.editBlockDataAs(dataType: Class<D>, editor: Consumer<D>, applyPhysics: Boolean = true) {
     val blockData = getBlockData(dataType)
     editor.accept(blockData)
     setBlockData(blockData, applyPhysics)
 }
 
-inline fun <reified D: BlockData> Block.editBlockData(editor: Consumer<D>, applyPhysics: Boolean = true) = editBlockData(D::class.java, editor, applyPhysics)
+@JvmSynthetic
+inline fun <reified D: BlockData> Block.editBlockDataAs(editor: Consumer<D>, applyPhysics: Boolean = true) = editBlockDataAs(D::class.java, editor, applyPhysics)
 
 fun <D: BlockData> Block.getBlockData(dataType: Class<D>): D {
     val blockData = this.blockData
