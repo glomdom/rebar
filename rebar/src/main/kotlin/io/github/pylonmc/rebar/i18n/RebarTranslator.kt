@@ -137,8 +137,10 @@ class RebarTranslator private constructor(private val addon: RebarAddon) : Trans
             if (parts.size < 2) return null
             val (addon, key) = parts
             if (addon != addonNamespace) return null
-            val translations = findTranslations(locale) ?: findTranslations(this.addon.defaultLanguage) ?: return null
-            val translation = translations.get(key, ConfigAdapter.STRING) ?: return null
+            val translations = findTranslations(locale)
+            val translation = translations?.get(key, ConfigAdapter.STRING)
+                ?: findTranslations(this.addon.defaultLanguage)?.get(key, ConfigAdapter.STRING)
+                ?: return null
             customMiniMessage.deserialize(translation)
         }
     }
