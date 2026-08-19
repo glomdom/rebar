@@ -44,6 +44,11 @@ public class TranslationFallbackTest extends SyncTest {
         assertThat(translator.canTranslate(MISSING_EVERYWHERE, Locale.SIMPLIFIED_CHINESE)).isFalse();
         assertThat(translator.translate(Component.translatable(MISSING_EVERYWHERE), Locale.SIMPLIFIED_CHINESE)).isNull();
 
+        // Exact lookups bypass the fallback (used by missing-translation warnings)
+        assertThat(translator.canTranslateExact(PRESENT_BOTH, Locale.SIMPLIFIED_CHINESE)).isTrue();
+        assertThat(translator.canTranslateExact(DEFAULT_ONLY, Locale.SIMPLIFIED_CHINESE)).isFalse();
+        assertThat(translator.canTranslateExact(DEFAULT_ONLY, Locale.ENGLISH)).isTrue();
+
         // Repeated lookups stay consistent
         assertThat(render(translator, DEFAULT_ONLY, Locale.SIMPLIFIED_CHINESE)).isEqualTo("English fallback value");
 
