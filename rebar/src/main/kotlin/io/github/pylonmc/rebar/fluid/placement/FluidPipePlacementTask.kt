@@ -65,6 +65,12 @@ internal class FluidPipePlacementTask(
             return
         }
 
+        // Check if player goes to other worlds
+        if (player.world != origin.position.world) {
+            FluidPipePlacementService.cancelConnection(player)
+            return
+        }
+
         // Check if player has moved too far away
         if (player.location.distance(origin.position.location) > RebarConfig.PIPE_PLACEMENT_CANCEL_DISTANCE) {
             FluidPipePlacementService.cancelConnection(player)
