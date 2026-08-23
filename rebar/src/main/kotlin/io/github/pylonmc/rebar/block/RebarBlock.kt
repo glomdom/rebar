@@ -20,7 +20,8 @@ import io.github.pylonmc.rebar.item.builder.ItemStackBuilder
 import io.github.pylonmc.rebar.nms.NmsAccessor
 import io.github.pylonmc.rebar.registry.RebarRegistry
 import io.github.pylonmc.rebar.util.IMMEDIATE_FACES
-import io.github.pylonmc.rebar.util.editBlockData
+import io.github.pylonmc.rebar.util.editBlockDataAs
+import io.github.pylonmc.rebar.util.getBlockData
 import io.github.pylonmc.rebar.util.isChunkLoaded
 import io.github.pylonmc.rebar.util.position.BlockPosition
 import io.github.pylonmc.rebar.util.position.position
@@ -142,14 +143,23 @@ open class RebarBlock private constructor(val block: Block) : WailaSupplier, Key
      */
     open fun postInitialise() {}
 
-    @JvmOverloads
-    fun editBlockData(editor: Consumer<BlockData>, applyPhysics: Boolean = true) {
-        block.editBlockData(editor, applyPhysics)
-    }
+    fun getBlockData() = getBlockDataAs(BlockData::class.java)
+
+    fun <D : BlockData> getBlockDataAs(dataType: Class<D>) = block.getBlockData(dataType)
+
+    @JvmSynthetic
+    inline fun <reified D : BlockData> getBlockDataAs() = block.getBlockData(D::class.java)
 
     @JvmOverloads
-    fun <D : BlockData> editBlockData(dataType: Class<D>, editor: Consumer<D>, applyPhysics: Boolean = true) {
-        block.editBlockData(dataType, editor, applyPhysics)
+    fun editBlockData(editor: Consumer<BlockData>, applyPhysics: Boolean = true) = editBlockDataAs(BlockData::class.java, editor, applyPhysics)
+
+    @JvmOverloads
+    fun <D : BlockData> editBlockDataAs(dataType: Class<D>, editor: Consumer<D>, applyPhysics: Boolean = true) {
+        block.editBlockDataAs(dataType, editor, applyPhysics)
+    }
+
+    inline fun <reified D : BlockData> editBlockDataAs(editor: Consumer<D>, applyPhysics: Boolean = true) {
+        block.editBlockDataAs(editor, applyPhysics)
     }
 
     /**
@@ -163,7 +173,7 @@ open class RebarBlock private constructor(val block: Block) : WailaSupplier, Key
      */
     protected open fun setupBlockTexture(entity: BlockTextureEntity): BlockTextureEntity = entity.apply {
         // TODO: Add a way to easily just change the transformation of the entity, without having to override this method entirely
-        val item = getBlockTextureItem() ?: ItemStack.of(Material.BARRIER)
+        val item = getBlockTextureItem()
         item.setData(DataComponentTypes.ITEM_MODEL, Key.key("air"))
         itemStack = item
         itemDisplayTransform = ItemDisplay.ItemDisplayTransform.FIXED
@@ -176,7 +186,7 @@ open class RebarBlock private constructor(val block: Block) : WailaSupplier, Key
      */
     fun refreshBlockTextureItem() {
         blockTextureEntity?.let {
-            it.itemStack = getBlockTextureItem() ?: ItemStack.of(Material.BARRIER)
+            it.itemStack = getBlockTextureItem()
         }
     }
 
@@ -195,7 +205,11 @@ open class RebarBlock private constructor(val block: Block) : WailaSupplier, Key
     open fun getBlockTextureProperties(): MutableMap<String, Pair<String, Int>> {
         val properties = mutableMapOf<String, Pair<String, Int>>()
         if (this is DirectionalRebarBlock) {
-            properties["facing"] = facing.name.lowercase() to IMMEDIATE_FACES.size
+            try {
+                properties["facing"] = facing.name.lowercase() to IMMEDIATE_FACES.size
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
         return properties
     }
@@ -216,7 +230,7 @@ open class RebarBlock private constructor(val block: Block) : WailaSupplier, Key
      *
      * @return the item that should be used to display the block's texture
      */
-    open fun getBlockTextureItem(): ItemStack? {
+    open fun getBlockTextureItem(): ItemStack {
         val builder = if (defaultItem != null) {
             ItemStackBuilder.of(defaultItem.getItemStack())
         } else {
