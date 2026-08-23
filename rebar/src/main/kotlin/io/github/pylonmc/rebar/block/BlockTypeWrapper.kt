@@ -5,6 +5,7 @@ import io.github.pylonmc.rebar.item.ItemTypeWrapper
 import io.github.pylonmc.rebar.registry.RebarRegistry
 import org.bukkit.*
 import org.bukkit.block.Block
+import org.bukkit.block.BlockType
 import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -79,6 +80,12 @@ sealed interface BlockTypeWrapper : Keyed {
         @JvmName("of")
         operator fun invoke(material: Material): BlockTypeWrapper {
             return Vanilla(material.createBlockData())
+        }
+
+        @JvmStatic
+        @JvmName("of")
+        operator fun invoke(blockType: BlockType): BlockTypeWrapper {
+            return Vanilla(blockType.createBlockData())
         }
 
         @JvmStatic

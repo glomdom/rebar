@@ -4,6 +4,7 @@ import io.github.pylonmc.rebar.block.BlockTypeWrapper
 import io.github.pylonmc.rebar.registry.RebarRegistry
 import org.bukkit.*
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 
 /**
  * Allows the representation of both vanilla and Rebar items in a unified way.
@@ -46,6 +47,18 @@ sealed interface ItemTypeWrapper : Keyed {
         operator fun invoke(stack: ItemStack): ItemTypeWrapper {
             val schema = RebarItemSchema.fromStack(stack)
             return if (schema != null) Rebar(schema) else Vanilla(stack.type)
+        }
+
+        @JvmStatic
+        @JvmName("of")
+        operator fun invoke(schema: RebarItemSchema): ItemTypeWrapper {
+            return Rebar(schema)
+        }
+
+        @JvmStatic
+        @JvmName("of")
+        operator fun invoke(itemType: ItemType): ItemTypeWrapper {
+            return ItemTypeWrapper(itemType.key)
         }
 
         @JvmStatic
